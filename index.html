@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LORD NUTRITION | Fuel Your Power</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="#home" class="logo">
+                <span class="logo-red">LORD</span><span class="logo-white">NUTRITION</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#home" data-i18n="home">Home</a>
+                <a href="#shop" data-i18n="shop">Shop</a>
+                <a href="#about" data-i18n="about">About Us</a>
+                <a href="#contact" data-i18n="contact">Contact</a>
+            </nav>
+            <div class="header-actions">
+                <button class="lang-toggle" id="langToggle">FR</button>
+                <a href="#cart" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="mobile-nav" id="mobileNav">
+            <a href="#home" data-i18n="home">Home</a>
+            <a href="#shop" data-i18n="shop">Shop</a>
+            <a href="#about" data-i18n="about">About Us</a>
+            <a href="#contact" data-i18n="contact">Contact</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="page-section active">
+            <div class="hero">
+                <div class="hero-overlay"></div>
+                <div class="container hero-content">
+                    <h1 class="hero-title" data-i18n="hero_title">FUEL YOUR POWER</h1>
+                    <p class="hero-subtitle" data-i18n="hero_subtitle">Premium sports nutrition for elite athletes.</p>
+                    <a href="#shop" class="btn btn-primary btn-large" data-i18n="shop_now">Shop Now</a>
+                </div>
+            </div>
+            <div class="container featured-section">
+                <h2 class="section-title" data-i18n="top_categories">Top Categories</h2>
+                <div class="category-grid">
+                    <div class="category-card" onclick="window.location.hash='#shop?cat=protein'" style="background-image: linear-gradient(rgba(18,18,18,0.4), rgba(18,18,18,0.9)), url('assets/product.png');">
+                        <h3 data-i18n="cat_protein">Protein</h3>
+                    </div>
+                    <div class="category-card" onclick="window.location.hash='#shop?cat=mass'" style="background-image: linear-gradient(rgba(18,18,18,0.4), rgba(18,18,18,0.9)), url('assets/product.png');">
+                        <h3 data-i18n="cat_mass">Mass Gainers</h3>
+                    </div>
+                    <div class="category-card" onclick="window.location.hash='#shop?cat=preworkout'" style="background-image: linear-gradient(rgba(18,18,18,0.4), rgba(18,18,18,0.9)), url('assets/product.png');">
+                        <h3 data-i18n="cat_preworkout">Pre-Workout</h3>
+                    </div>
+                    <div class="category-card" onclick="window.location.hash='#shop?cat=vitamins'" style="background-image: linear-gradient(rgba(18,18,18,0.4), rgba(18,18,18,0.9)), url('assets/product.png');">
+                        <h3 data-i18n="cat_vitamins">Vitamins</h3>
+                    </div>
+                    <div class="category-card" onclick="window.location.hash='#shop?cat=pack'" style="background-image: linear-gradient(rgba(18,18,18,0.4), rgba(18,18,18,0.9)), url('assets/product.png');">
+                        <h3 data-i18n="cat_pack">Packs</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Sellers Section -->
+            <div class="container featured-section">
+                <h2 class="section-title" data-i18n="best_sellers">Best Sellers</h2>
+                <div class="product-grid" id="bestSellersGrid">
+                    <!-- Products injected via JS -->
+                </div>
+                <div style="text-align: center; margin-top: 50px;">
+                    <a href="#shop" class="btn btn-primary btn-large" data-i18n="view_all">View All Products</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Shop Section -->
+        <section id="shop" class="page-section">
+            <div class="page-header">
+                <div class="container">
+                    <h1 data-i18n="shop">Shop</h1>
+                </div>
+            </div>
+            <div class="container shop-container">
+                <aside class="filters">
+                    <h3 data-i18n="categories">Categories</h3>
+                    <ul id="categoryList">
+                        <li class="active" data-cat="all" data-i18n="all_products">All Products</li>
+                        <li data-cat="protein" data-i18n="cat_protein">Protein</li>
+                        <li data-cat="mass" data-i18n="cat_mass">Mass Gainers</li>
+                        <li data-cat="preworkout" data-i18n="cat_preworkout">Pre-Workout</li>
+                        <li><a href="#shop?cat=vitamins" data-i18n="cat_vitamins">Vitamins</a></li>
+                        <li><a href="#shop?cat=pack" data-i18n="cat_pack">Packs</a></li>
+                    </ul>
+                </aside>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products dynamically injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Detail Section -->
+        <section id="product-detail" class="page-section">
+            <div class="container product-detail-container">
+                <div class="product-detail-image">
+                    <img src="assets/product.png" alt="Product Image" id="detailImage">
+                </div>
+                <div class="product-detail-info">
+                    <h1 id="detailTitle">Product Name</h1>
+                    <div class="product-price" id="detailPrice">$0.00</div>
+                    <div class="product-description" id="detailDesc">Description</div>
+                    <div class="product-benefits">
+                        <h3 data-i18n="benefits">Benefits</h3>
+                        <ul id="detailBenefits"></ul>
+                    </div>
+                    <button class="btn btn-primary btn-large w-100" id="detailAddToCart" data-i18n="order_now">Order Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart Section -->
+        <section id="cart" class="page-section">
+            <div class="page-header">
+                <div class="container">
+                    <h1 data-i18n="shopping_cart">Shopping Cart</h1>
+                </div>
+            </div>
+            <div class="container cart-container">
+                <div class="cart-items" id="cartItems">
+                    <!-- Cart items injected here -->
+                </div>
+                <div class="cart-summary">
+                    <h3 data-i18n="order_summary">Order Summary</h3>
+                    <div class="summary-row">
+                        <span data-i18n="subtotal">Subtotal</span>
+                        <span id="cartSubtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span data-i18n="shipping">Shipping</span>
+                        <span data-i18n="free">Free</span>
+                    </div>
+                    <div class="summary-total">
+                        <span data-i18n="total">Total</span>
+                        <span id="cartTotal">$0.00</span>
+                    </div>
+                    <a href="#checkout" class="btn btn-primary btn-large w-100" data-i18n="proceed_checkout">Proceed to Checkout</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Checkout Section -->
+        <section id="checkout" class="page-section">
+            <div class="page-header">
+                <div class="container">
+                    <h1 data-i18n="checkout">Checkout</h1>
+                </div>
+            </div>
+            <div class="container checkout-container">
+                <form id="checkoutForm" class="checkout-form">
+                    <div class="form-group">
+                        <label for="name" data-i18n="full_name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" data-i18n="phone_number">Phone Number</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" data-i18n="address">Address</label>
+                        <input type="text" id="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city" data-i18n="city">City</label>
+                        <input type="text" id="city" required>
+                    </div>
+                    <div class="payment-method">
+                        <h3 data-i18n="payment_method">Payment Method</h3>
+                        <div class="cod-box">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span data-i18n="cod">Cash on Delivery (COD)</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large w-100" data-i18n="confirm_order">Confirm Order</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="page-section">
+            <div class="page-header">
+                <div class="container">
+                    <h1 data-i18n="about">About Us</h1>
+                </div>
+            </div>
+            <div class="container about-container">
+                <div class="about-content-text">
+                    <h2 data-i18n="our_story">Our Story</h2>
+                    <p class="about-lead" data-i18n="about_text"></p>
+                    
+                    <div class="about-features">
+                        <div class="feature">
+                            <i class="fas fa-bullseye" style="color: var(--primary-color);"></i>
+                            <p data-i18n="about_mission"></p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-shipping-fast" style="color: var(--primary-color);"></i>
+                            <p data-i18n="about_delivery"></p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-handshake" style="color: var(--primary-color);"></i>
+                            <p data-i18n="about_values"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="page-section">
+            <div class="page-header">
+                <div class="container">
+                    <h1 data-i18n="contact">Contact</h1>
+                </div>
+            </div>
+            <div class="container contact-container">
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <label for="contactName" data-i18n="full_name">Full Name</label>
+                        <input type="text" id="contactName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail" data-i18n="email">Email</label>
+                        <input type="email" id="contactEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactPhone" data-i18n="phone_number">Phone Number</label>
+                        <input type="tel" id="contactPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactMessage" data-i18n="message">Message</label>
+                        <textarea id="contactMessage" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" data-i18n="send_message">Send Message</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <h2 class="logo"><span class="logo-red">LORD</span><span class="logo-white">NUTRITION</span></h2>
+                <p data-i18n="footer_slogan">Fuel Your Power.</p>
+                <div class="social-links">
+                    <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4 style="margin-bottom: 15px; color: white;">Navigation</h4>
+                <a href="#home" data-i18n="home">Home</a>
+                <a href="#shop" data-i18n="shop">Shop</a>
+                <a href="#about" data-i18n="about">About Us</a>
+                <a href="#contact" data-i18n="contact">Contact</a>
+            </div>
+            <div class="footer-contact-info">
+                <h4 style="margin-bottom: 15px; color: white;">Contact Us</h4>
+                <p><i class="fas fa-phone"></i> +216 12 345 678</p>
+                <p><i class="fas fa-envelope"></i> contact@lordnutrition.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> Tunis, Tunisia</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LORD NUTRITION. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/1234567890" class="whatsapp-btn" target="_blank" title="Contact us on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Order Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <i class="fas fa-check-circle" style="color: #4CAF50; font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h2 data-i18n="order_success">Order Confirmed!</h2>
+            <p data-i18n="order_success_desc">Thank you for your order. We will contact you shortly to confirm delivery.</p>
+            <button class="btn btn-primary" onclick="closeModal()" data-i18n="continue_shopping">Continue Shopping</button>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

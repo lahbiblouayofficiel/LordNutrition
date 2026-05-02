@@ -1,0 +1,78 @@
+.admin-main {
+    padding-top: 100px;
+    min-height: calc(100vh - 80px);
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.admin-table-container {
+    background-color: var(--bg-card);
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid #333;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+
+.admin-table th {
+    font-family: var(--font-heading);
+    color: var(--primary-color);
+    text-transform: uppercase;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #222;
+}
+
+.admin-table img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin-right: 10px;
+    color: var(--text-muted);
+}
+
+.action-btn.edit:hover { color: #4CAF50; }
+.action-btn.delete:hover { color: var(--primary-color); }
+
+.admin-modal {
+    max-width: 500px;
+    text-align: left;
+}
+
+.admin-modal input, .admin-modal select, .admin-modal textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: #222;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.admin-modal input:focus, .admin-modal select:focus, .admin-modal textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}

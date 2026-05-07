@@ -366,9 +366,19 @@ async function loadSettings() {
     } catch (e) {}
 }
 
+function loadProducts() {
+    const local = JSON.parse(localStorage.getItem('lordProducts'));
+    if (local && local.length > 0) {
+        lordProducts = local;
+    } else {
+        lordProducts = defaultProducts;
+    }
+}
+
 // --- Render Logic ---
 function renderProducts(category = 'all') {
     const grid = document.getElementById('productsGrid');
+    if (!grid) return;
     grid.innerHTML = '';
 
     const filtered = category === 'all' ? lordProducts : lordProducts.filter(p => p.category === category);
@@ -466,6 +476,7 @@ function renderProductDetail(id) {
 
 function renderCart() {
     const container = document.getElementById('cartItems');
+    if (!container) return;
     container.innerHTML = '';
     let total = 0;
 
@@ -547,7 +558,8 @@ function saveCart() {
 }
 
 function updateCartCount() {
-    document.getElementById('cartCount').innerText = cart.length;
+    const countEl = document.getElementById('cartCount');
+    if (countEl) countEl.innerText = cart.length;
 }
 
 // --- Checkout ---

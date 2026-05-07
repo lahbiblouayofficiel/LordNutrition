@@ -279,7 +279,20 @@ async function init() {
 
 // --- Routing (SPA) ---
 function initRouter() {
-    window.addEventListener('hashchange', handleRoute);
+    console.log("Router Initializing...");
+    window.addEventListener('hashchange', () => {
+        console.log("Hash changed to:", window.location.hash);
+        handleRoute();
+    });
+    
+    // Fallback: Catch direct clicks on hash links
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link && link.getAttribute('href')?.startsWith('#')) {
+            setTimeout(handleRoute, 10);
+        }
+    });
+
     handleRoute();
 }
 

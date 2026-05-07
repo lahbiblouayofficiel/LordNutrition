@@ -3,29 +3,37 @@ let messages = [];
 let orders = [];
 let siteSettings = {};
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadAllData();
+// --- Supabase Configuration ---
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadAllData();
     initAdmin();
 });
 
-function loadAllData() {
-    products = JSON.parse(localStorage.getItem('lordProducts')) || [];
-    messages = JSON.parse(localStorage.getItem('lordMessages')) || [];
-    orders = JSON.parse(localStorage.getItem('lordOrders')) || [];
-    siteSettings = JSON.parse(localStorage.getItem('lordSettings')) || {
-        phone: '+216 12 345 678',
-        whatsapp: '12345678',
-        email: 'contact@lordnutrition.com',
-        address: 'Tunis, Tunisia',
-        facebook: 'https://facebook.com',
-        instagram: 'https://instagram.com'
-    };
+async function loadAllData() {
+    // Load Products
+    const { data: pData } = await supabase.from('products').select('*');
+    products = pData || [];
+    
+    // Load Orders
+    const { data: oData } = await supabase.from('orders').select('*');
+    orders = oData || [];
+    
+    // Load Messages
+    const { data: mData } = await supabase.from('messages').select('*');
+    messages = mData || [];
+    
+    // Load Settings
+    const { data: sData } = await supabase.from('settings').select('*');
+    if (sData) {
+        sData.forEach(s => siteSettings[s.key] = s.value);
+    }
 }
 
-function saveProducts() { localStorage.setItem('lordProducts', JSON.stringify(products)); }
-function saveMessages() { localStorage.setItem('lordMessages', JSON.stringify(messages)); }
-function saveOrders() { localStorage.setItem('lordOrders', JSON.stringify(orders)); }
-function saveSettings() { localStorage.setItem('lordSettings', JSON.stringify(siteSettings)); }
+// Storage removal
 
 function initAdmin() {
     // Nav Click Handlers
@@ -172,7 +180,7 @@ function closeModal() {
     document.getElementById('productModal').classList.remove('active');
 }
 
-function handleProductSubmit(e) {
+async function handleProductSubmit(e) {
     e.preventDefault();
     
     const idx = document.getElementById('productId').value;
@@ -180,7 +188,7 @@ function handleProductSubmit(e) {
         name: document.getElementById('productName').value,
         category: document.getElementById('productCategory').value,
         price: parseFloat(document.getElementById('productPrice').value),
-        image: document.getElementById('productImageValue').value || 'assets/product.png',
+        image: document.getElementById('productImageValue').value,
         desc: document.getElementById('productDesc').value,
         benefits: document.getElementById('productBenefits').value.split(',').map(s => s.trim()).filter(s => s),
         flavors: document.getElementById('productFlavors').value.split(',').map(s => s.trim()).filter(s => s),
@@ -188,22 +196,23 @@ function handleProductSubmit(e) {
     };
 
     if (idx === '') {
-        productData.id = Date.now();
-        products.push(productData);
+        await supabase.from('products').insert([productData]);
     } else {
-        products[parseInt(idx)] = { ...products[parseInt(idx)], ...productData };
+        const pId = products[parseInt(idx)].id;
+        await supabase.from('products').update(productData).eq('id', pId);
     }
 
-    saveProducts();
+    await loadAllData();
     renderProductsTable();
     renderDashboard();
     closeModal();
 }
 
-function deleteProduct(idx) {
+async function deleteProduct(idx) {
     if (confirm('Delete this product permanently?')) {
-        products.splice(idx, 1);
-        saveProducts();
+        const pId = products[idx].id;
+        await supabase.from('products').delete().eq('id', pId);
+        await loadAllData();
         renderProductsTable();
         renderDashboard();
     }
@@ -241,21 +250,24 @@ function renderOrdersTable() {
     });
 }
 
-function updateOrderStatus(idx, newStatus) {
-    orders[idx].status = newStatus;
-    // Auto-mark as read if changed from pending
-    if (newStatus !== 'pending') orders[idx].isRead = true;
+async function updateOrderStatus(idx, newStatus) {
+    const oId = orders[idx].id;
+    const update = { status: newStatus };
+    if (newStatus !== 'pending') update.is_read = true;
     
-    saveOrders();
+    await supabase.from('orders').update(update).eq('id', oId);
+    
+    await loadAllData();
     renderOrdersTable();
     renderDashboard();
     updateBadges();
 }
 
-function deleteOrder(idx) {
+async function deleteOrder(idx) {
     if (confirm('Delete this order history?')) {
-        orders.splice(idx, 1);
-        saveOrders();
+        const oId = orders[idx].id;
+        await supabase.from('orders').delete().eq('id', oId);
+        await loadAllData();
         renderOrdersTable();
         renderDashboard();
         updateBadges();
@@ -287,17 +299,19 @@ function renderMessagesTable() {
     });
 }
 
-function markMsgRead(idx) {
-    messages[idx].isRead = true;
-    saveMessages();
+async function markMsgRead(idx) {
+    const mId = messages[idx].id;
+    await supabase.from('messages').update({ is_read: true }).eq('id', mId);
+    await loadAllData();
     renderMessagesTable();
     updateBadges();
 }
 
-function deleteMsg(idx) {
+async function deleteMsg(idx) {
     if (confirm('Delete this message?')) {
-        messages.splice(idx, 1);
-        saveMessages();
+        const mId = messages[idx].id;
+        await supabase.from('messages').delete().eq('id', mId);
+        await loadAllData();
         renderMessagesTable();
         updateBadges();
     }
@@ -313,9 +327,9 @@ function populateSettingsForm() {
     document.getElementById('setInstagram').value = siteSettings.instagram;
 }
 
-function handleSettingsSubmit(e) {
+async function handleSettingsSubmit(e) {
     e.preventDefault();
-    siteSettings = {
+    const newSettings = {
         phone: document.getElementById('setPhone').value,
         whatsapp: document.getElementById('setWhatsapp').value,
         email: document.getElementById('setEmail').value,
@@ -323,7 +337,12 @@ function handleSettingsSubmit(e) {
         facebook: document.getElementById('setFacebook').value,
         instagram: document.getElementById('setInstagram').value
     };
-    saveSettings();
+    
+    for (const [key, value] of Object.entries(newSettings)) {
+        await supabase.from('settings').upsert({ key, value });
+    }
+    
+    await loadAllData();
     alert('Settings saved successfully!');
 }
 

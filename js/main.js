@@ -68,15 +68,17 @@ const defaultProducts = [
     }
 ];
 
-let products = JSON.parse(localStorage.getItem('lordProducts'));
-if (!products) {
-    products = defaultProducts;
-    localStorage.setItem('lordProducts', JSON.stringify(products));
-}
-
 let cart = JSON.parse(localStorage.getItem('lordCart')) || [];
+let lordProducts = [];
+
 let currentLang = localStorage.getItem('lordLang') || 'FR';
-let siteSettings = JSON.parse(localStorage.getItem('lordSettings')) || {
+
+// --- Supabase Configuration ---
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let siteSettings = {
     phone: '+216 12 345 678',
     whatsapp: '12345678',
     email: 'contact@lordnutrition.com',
@@ -174,7 +176,11 @@ const translations = {
 };
 
 // --- Initialization ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', init);
+
+async function init() {
+    await loadSettings();
+    await loadProductsFromDB();
     initRouter();
     renderProducts();
     renderBestSellers();
@@ -314,12 +320,38 @@ function handleRoute() {
     document.getElementById('mobileNav').classList.remove('open');
 }
 
+async function loadProductsFromDB() {
+    try {
+        const { data, error } = await supabase.from('products').select('*');
+        if (!error && data && data.length > 0) {
+            lordProducts = data;
+        } else {
+            lordProducts = defaultProducts;
+        }
+    } catch (e) {
+        lordProducts = defaultProducts;
+    }
+}
+
+async function loadSettings() {
+    try {
+        const { data, error } = await supabase.from('settings').select('*');
+        if (!error && data) {
+            data.forEach(s => {
+                if (siteSettings.hasOwnProperty(s.key)) {
+                    siteSettings[s.key] = s.value;
+                }
+            });
+        }
+    } catch (e) {}
+}
+
 // --- Render Logic ---
 function renderProducts(category = 'all') {
     const grid = document.getElementById('productsGrid');
     grid.innerHTML = '';
 
-    const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+    const filtered = category === 'all' ? lordProducts : lordProducts.filter(p => p.category === category);
 
     filtered.forEach(product => {
         const card = document.createElement('div');
@@ -337,7 +369,7 @@ function renderProducts(category = 'all') {
 }
 
 function renderProductDetail(id) {
-    const product = products.find(p => p.id === id);
+    const product = lordProducts.find(p => p.id === id);
     if (!product) return;
 
     // Breadcrumbs & Title
@@ -470,7 +502,7 @@ function renderBestSellers() {
 
 // --- Cart Logic ---
 function addToCart(id, qty = 1, flavor = null, size = null) {
-    const product = products.find(p => p.id === id);
+    const product = lordProducts.find(p => p.id === id);
     if (product) {
         const cartItem = {
             ...product,
@@ -500,7 +532,7 @@ function updateCartCount() {
 }
 
 // --- Checkout ---
-function handleCheckout(e) {
+async function handleCheckout(e) {
     e.preventDefault();
     if(cart.length === 0) {
         alert('Cart is empty!');
@@ -513,19 +545,22 @@ function handleCheckout(e) {
     const city = document.getElementById('city').value;
     const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
-    let orders = JSON.parse(localStorage.getItem('lordOrders')) || [];
-    orders.push({
-        id: Date.now(),
+    const orderData = {
         date: new Date().toLocaleString(),
-        name,
-        phone,
-        address,
-        city,
-        items: [...cart],
+        name, phone, address, city,
+        items: JSON.stringify(cart),
         total,
-        isRead: false
-    });
-    localStorage.setItem('lordOrders', JSON.stringify(orders));
+        status: 'pending',
+        is_read: false
+    };
+
+    const { error } = await supabase.from('orders').insert([orderData]);
+    
+    if (error) {
+        console.error('Order error:', error);
+        alert('Error placing order. Please try again.');
+        return;
+    }
     
     // Simulate API call for order
     cart = [];

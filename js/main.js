@@ -4,55 +4,67 @@ const defaultProducts = [
         id: 1,
         name: "Lord 100% Whey Protein",
         category: "protein",
-        price: 59.99,
+        price: 189.00,
         image: "assets/product.png",
         desc: "Premium 100% whey protein isolate for fast recovery and muscle growth.",
-        benefits: ["25g Protein per serving", "Zero sugar", "Fast absorption"]
+        benefits: ["25g Protein per serving", "Zero sugar", "Fast absorption", "Rich in BCAA"],
+        flavors: ["Chocolate", "Vanilla", "Strawberry"],
+        sizes: ["900g", "2.2kg"]
     },
     {
         id: 2,
         name: "Titan Mass Gainer",
         category: "mass",
-        price: 45.00,
+        price: 145.00,
         image: "assets/product.png",
         desc: "High-calorie mass gainer packed with complex carbs and protein to help you bulk up.",
-        benefits: ["1000+ Calories", "50g Protein", "Added Creatine"]
+        benefits: ["1000+ Calories", "50g Protein", "Added Creatine", "Digestive Enzymes"],
+        flavors: ["Chocolate", "Cookies & Cream"],
+        sizes: ["3kg", "5kg"]
     },
     {
         id: 3,
         name: "Explosive Pre-Workout",
         category: "preworkout",
-        price: 34.99,
+        price: 95.00,
         image: "assets/product.png",
         desc: "Insane energy, laser focus, and skin-tearing pumps for your hardest workouts.",
-        benefits: ["300mg Caffeine", "L-Citrulline for pumps", "Beta-Alanine for endurance"]
+        benefits: ["300mg Caffeine", "L-Citrulline for pumps", "Beta-Alanine for endurance", "Vitamin B complex"],
+        flavors: ["Fruit Punch", "Blue Raspberry", "Green Apple"],
+        sizes: ["30 Servings"]
     },
     {
         id: 4,
         name: "Elite Multi-Vitamin",
         category: "vitamins",
-        price: 24.99,
+        price: 65.00,
         image: "assets/product.png",
         desc: "Comprehensive vitamin and mineral complex designed for hard-training athletes.",
-        benefits: ["Immune support", "Joint health", "Antioxidant blend"]
+        benefits: ["Immune support", "Joint health", "Antioxidant blend", "60 Capsules"],
+        flavors: ["Unflavored"],
+        sizes: ["60 Caps"]
     },
     {
         id: 5,
         name: "Lord Casein Night Protein",
         category: "protein",
-        price: 64.99,
+        price: 195.00,
         image: "assets/product.png",
         desc: "Slow-digesting casein protein to feed your muscles while you sleep.",
-        benefits: ["Slow release amino acids", "Prevents muscle breakdown", "Great taste"]
+        benefits: ["Slow release amino acids", "Prevents muscle breakdown", "Great taste", "8h Sustained Release"],
+        flavors: ["Chocolate", "Vanilla"],
+        sizes: ["900g"]
     },
     {
         id: 6,
         name: "Pump Formula (Stim-Free)",
         category: "preworkout",
-        price: 39.99,
+        price: 110.00,
         image: "assets/product.png",
         desc: "Stimulant-free pre-workout focused purely on increasing blood flow and muscle pumps.",
-        benefits: ["No caffeine", "Massive pumps", "Can be taken at night"]
+        benefits: ["No caffeine", "Massive pumps", "Can be taken at night", "Nitric Oxide Booster"],
+        flavors: ["Orange Bloom", "Watermelon"],
+        sizes: ["20 Servings"]
     }
 ];
 
@@ -64,6 +76,14 @@ if (!products) {
 
 let cart = JSON.parse(localStorage.getItem('lordCart')) || [];
 let currentLang = localStorage.getItem('lordLang') || 'FR';
+let siteSettings = JSON.parse(localStorage.getItem('lordSettings')) || {
+    phone: '+216 12 345 678',
+    whatsapp: '12345678',
+    email: 'contact@lordnutrition.com',
+    address: 'Tunis, Tunisia',
+    facebook: 'https://facebook.com',
+    instagram: 'https://instagram.com'
+};
 
 // --- i18n Translations ---
 const translations = {
@@ -91,7 +111,9 @@ const translations = {
         email: "Email", message: "Message", send_message: "Send Message",
         footer_slogan: "Fuel Your Power.", order_success: "Order Confirmed!",
         order_success_desc: "Thank you for your order. We will contact you shortly to confirm delivery.",
-        continue_shopping: "Continue Shopping", empty_cart: "Your cart is empty."
+        continue_shopping: "Continue Shopping", empty_cart: "Your cart is empty.",
+        in_stock: "In Stock", flavor: "Flavor", size: "Size",
+        delivery_info: "Delivery in 24/48h", authentic_product: "100% Authentic Product"
     },
     FR: {
         home: "Accueil", shop: "Boutique", about: "À Propos", contact: "Contact",
@@ -117,7 +139,9 @@ const translations = {
         email: "Email", message: "Message", send_message: "Envoyer le Message",
         footer_slogan: "Alimentez Votre Puissance.", order_success: "Commande Confirmée !",
         order_success_desc: "Merci pour votre commande. Nous vous contacterons sous peu pour confirmer la livraison.",
-        continue_shopping: "Continuer les Achats", empty_cart: "Votre panier est vide."
+        continue_shopping: "Continuer les Achats", empty_cart: "Votre panier est vide.",
+        in_stock: "En Stock", flavor: "Arôme", size: "Format",
+        delivery_info: "Livraison en 24/48h", authentic_product: "Produit 100% Authentique"
     },
     AR: {
         home: "الرئيسية", shop: "المتجر", about: "من نحن", contact: "اتصل بنا",
@@ -143,7 +167,9 @@ const translations = {
         email: "البريد الإلكتروني", message: "رسالة", send_message: "إرسال رسالة",
         footer_slogan: "زود طاقتك.", order_success: "تم تأكيد الطلب!",
         order_success_desc: "شكرا لطلبك. سنتصل بك قريباً لتأكيد التوصيل.",
-        continue_shopping: "متابعة التسوق", empty_cart: "عربة التسوق فارغة."
+        continue_shopping: "متابعة التسوق", empty_cart: "عربة التسوق فارغة.",
+        in_stock: "متوفر", flavor: "النكهة", size: "الحجم",
+        delivery_info: "التوصيل في 24/48 ساعة", authentic_product: "منتج أصلي 100%"
     }
 };
 
@@ -154,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderBestSellers();
     updateCartCount();
     updateLanguage();
+    applySettings();
     
     // Mobile Menu
     document.getElementById('mobileMenuBtn').addEventListener('click', () => {
@@ -218,6 +245,19 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Message sent successfully!');
         e.target.reset();
     });
+
+    // Quantity Stepper
+    document.getElementById('qtyPlus').addEventListener('click', () => {
+        const input = document.getElementById('detailQty');
+        input.value = parseInt(input.value) + 1;
+    });
+
+    document.getElementById('qtyMinus').addEventListener('click', () => {
+        const input = document.getElementById('detailQty');
+        if (parseInt(input.value) > 1) {
+            input.value = parseInt(input.value) - 1;
+        }
+    });
 });
 
 // --- Routing (SPA) ---
@@ -227,18 +267,23 @@ function initRouter() {
 }
 
 function handleRoute() {
-    let hash = window.location.hash || '#home';
-    const paramsString = hash.split('?')[1];
-    hash = hash.split('?')[0];
+    let fullHash = window.location.hash || '#home';
+    const paramsString = fullHash.split('?')[1];
+    const hash = fullHash.split('?')[0];
 
     // Hide all sections
     document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
     
+    let targetId = hash;
+
     // Handle specific routes
     if (hash === '#product') {
         const urlParams = new URLSearchParams(paramsString);
         const productId = parseInt(urlParams.get('id'));
-        if(productId) renderProductDetail(productId);
+        if(productId) {
+            renderProductDetail(productId);
+            targetId = '#product-detail';
+        }
     } else if (hash === '#cart') {
         renderCart();
     } else if (hash === '#shop') {
@@ -257,7 +302,7 @@ function handleRoute() {
     }
 
     // Show active section
-    const targetSection = document.querySelector(hash);
+    const targetSection = document.querySelector(targetId);
     if (targetSection) {
         targetSection.classList.add('active');
         window.scrollTo(0, 0);
@@ -282,8 +327,8 @@ function renderProducts(category = 'all') {
         card.innerHTML = `
             <img src="${product.image}" alt="${product.name}" class="product-image" onclick="window.location.hash='#product?id=${product.id}'" style="cursor:pointer;">
             <div class="product-info">
-                <h3 class="product-title">${product.name}</h3>
-                <div class="product-price">$${product.price.toFixed(2)}</div>
+                <h3 class="product-title" onclick="window.location.hash='#product?id=${product.id}'" style="cursor:pointer;">${product.name}</h3>
+                <div class="product-price">${product.price.toFixed(2)} TND</div>
                 <button class="btn btn-primary w-100" onclick="addToCart(${product.id})" data-i18n="order_now">${translations[currentLang].order_now}</button>
             </div>
         `;
@@ -295,11 +340,58 @@ function renderProductDetail(id) {
     const product = products.find(p => p.id === id);
     if (!product) return;
 
-    document.getElementById('detailImage').src = product.image;
+    // Breadcrumbs & Title
+    document.getElementById('breadcrumbCategory').innerText = translations[currentLang][`cat_${product.category}`] || product.category;
+    document.getElementById('breadcrumbTitle').innerText = product.name;
     document.getElementById('detailTitle').innerText = product.name;
-    document.getElementById('detailPrice').innerText = `$${product.price.toFixed(2)}`;
+    
+    // Image & Price
+    document.getElementById('detailImage').src = product.image;
+    document.getElementById('detailPrice').innerText = `${product.price.toFixed(2)} TND`;
     document.getElementById('detailDesc').innerText = product.desc;
     
+    // Reset Quantity
+    document.getElementById('detailQty').value = 1;
+
+    // Flavors
+    const flavorOptions = document.getElementById('flavorOptions');
+    flavorOptions.innerHTML = '';
+    if (product.flavors && product.flavors.length > 0) {
+        document.getElementById('flavorGroup').style.display = 'block';
+        product.flavors.forEach((f, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `option-btn ${idx === 0 ? 'active' : ''}`;
+            btn.innerText = f;
+            btn.onclick = () => {
+                flavorOptions.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            flavorOptions.appendChild(btn);
+        });
+    } else {
+        document.getElementById('flavorGroup').style.display = 'none';
+    }
+
+    // Sizes
+    const sizeOptions = document.getElementById('sizeOptions');
+    sizeOptions.innerHTML = '';
+    if (product.sizes && product.sizes.length > 0) {
+        document.getElementById('sizeGroup').style.display = 'block';
+        product.sizes.forEach((s, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `option-btn ${idx === 0 ? 'active' : ''}`;
+            btn.innerText = s;
+            btn.onclick = () => {
+                sizeOptions.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            sizeOptions.appendChild(btn);
+        });
+    } else {
+        document.getElementById('sizeGroup').style.display = 'none';
+    }
+
+    // Benefits
     const benefitsList = document.getElementById('detailBenefits');
     benefitsList.innerHTML = '';
     product.benefits.forEach(b => {
@@ -308,9 +400,14 @@ function renderProductDetail(id) {
         benefitsList.appendChild(li);
     });
 
+    // Add to Cart Logic
     const btn = document.getElementById('detailAddToCart');
     btn.onclick = () => {
-        addToCart(product.id);
+        const selectedFlavor = flavorOptions.querySelector('.option-btn.active')?.innerText || null;
+        const selectedSize = sizeOptions.querySelector('.option-btn.active')?.innerText || null;
+        const qty = parseInt(document.getElementById('detailQty').value);
+        
+        addToCart(product.id, qty, selectedFlavor, selectedSize);
         window.location.hash = '#cart';
     };
 }
@@ -324,14 +421,18 @@ function renderCart() {
         container.innerHTML = `<p>${translations[currentLang].empty_cart}</p>`;
     } else {
         cart.forEach((item, index) => {
-            total += item.price;
+            total += item.price * (item.quantity || 1);
             const el = document.createElement('div');
             el.className = 'cart-item';
             el.innerHTML = `
                 <img src="${item.image}" alt="${item.name}">
                 <div class="cart-item-details">
                     <div class="cart-item-title">${item.name}</div>
-                    <div class="cart-item-price">${item.price.toFixed(2)} TND</div>
+                    <div class="cart-item-meta" style="font-size: 0.8rem; color: var(--text-muted);">
+                        ${item.flavor ? `Flavor: ${item.flavor}` : ''} 
+                        ${item.size ? `| Size: ${item.size}` : ''}
+                    </div>
+                    <div class="cart-item-price">${item.price.toFixed(2)} TND x ${item.quantity || 1}</div>
                 </div>
                 <button class="remove-btn" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
             `;
@@ -356,7 +457,7 @@ function renderBestSellers() {
         div.innerHTML = `
             <img src="${p.image}" alt="${p.name}" class="product-image" onclick="window.location.hash='#product?id=${p.id}'" style="cursor:pointer">
             <div class="product-info">
-                <h3>${p.name}</h3>
+                <h3 onclick="window.location.hash='#product?id=${p.id}'" style="cursor:pointer">${p.name}</h3>
                 <p class="product-price" style="font-weight: bold; color: var(--primary-color); margin: 10px 0;">${p.price.toFixed(2)} TND</p>
                 <button class="btn btn-primary" style="width: 100%; border-radius: var(--radius-md);" onclick="addToCart(${p.id})">
                     <i class="fas fa-shopping-cart"></i> Add
@@ -368,10 +469,16 @@ function renderBestSellers() {
 }
 
 // --- Cart Logic ---
-function addToCart(id) {
+function addToCart(id, qty = 1, flavor = null, size = null) {
     const product = products.find(p => p.id === id);
     if (product) {
-        cart.push(product);
+        const cartItem = {
+            ...product,
+            quantity: qty,
+            flavor: flavor,
+            size: size
+        };
+        cart.push(cartItem);
         saveCart();
         alert('Added to cart!');
     }
@@ -404,7 +511,7 @@ function handleCheckout(e) {
     const phone = document.getElementById('phone').value;
     const address = document.getElementById('address').value;
     const city = document.getElementById('city').value;
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
     let orders = JSON.parse(localStorage.getItem('lordOrders')) || [];
     orders.push({
@@ -445,4 +552,25 @@ function updateLanguage() {
             }
         }
     });
+}
+
+function applySettings() {
+    // Phone
+    const phoneEls = document.querySelectorAll('.footer-contact-info p:nth-child(2), .whatsapp-btn');
+    if (phoneEls[0]) phoneEls[0].innerHTML = `<i class="fas fa-phone"></i> ${siteSettings.phone}`;
+    if (phoneEls[1]) phoneEls[1].href = `https://wa.me/${siteSettings.whatsapp.replace(/\s/g, '')}`;
+    
+    // Email
+    const emailEl = document.querySelector('.footer-contact-info p:nth-child(3)');
+    if (emailEl) emailEl.innerHTML = `<i class="fas fa-envelope"></i> ${siteSettings.email}`;
+    
+    // Address
+    const addrEl = document.querySelector('.footer-contact-info p:nth-child(4)');
+    if (addrEl) addrEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${siteSettings.address}`;
+    
+    // Social Links
+    const instaEl = document.querySelector('.social-links a[aria-label="Instagram"]');
+    const fbEl = document.querySelector('.social-links a[aria-label="Facebook"]');
+    if (instaEl) instaEl.href = siteSettings.instagram;
+    if (fbEl) fbEl.href = siteSettings.facebook;
 }

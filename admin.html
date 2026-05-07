@@ -3,44 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | LORD NUTRITION</title>
+    <title>Professional Admin Dashboard | LORD NUTRITION</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-    <header class="header">
-        <div class="container header-container">
-            <a href="index.html" class="logo">
-                <span class="logo-red">LORD</span><span class="logo-white">ADMIN</span>
-            </a>
-            <div class="header-actions">
-                <a href="index.html" class="btn btn-primary" style="padding: 8px 16px;">Back to Store</a>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <span class="logo-red">LORD</span><span class="logo-white">ADMIN</span>
+                </a>
             </div>
-        </div>
-    </header>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-tab="products">
+                    <i class="fas fa-box"></i> Products
+                </a>
+                <a href="#" class="nav-item" data-tab="orders">
+                    <i class="fas fa-shopping-bag"></i> Orders
+                    <span class="badge" id="orderBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="messages">
+                    <i class="fas fa-envelope"></i> Messages
+                    <span class="badge" id="msgBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="settings">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="btn btn-primary w-100">
+                    <i class="fas fa-external-link-alt"></i> View Store
+                </a>
+            </div>
+        </aside>
 
-    <main class="admin-main">
-        <div class="container">
-            <div class="admin-tabs" style="display: flex; gap: 10px; margin-bottom: 30px;">
-                <button class="btn btn-primary" id="tabBtnProducts" onclick="switchTab('products')">Products</button>
-                <button class="btn" id="tabBtnOrders" style="background: #333; color: white; display: flex; align-items: center;" onclick="switchTab('orders')">
-                    Orders 
-                    <span id="orderBadge" style="background: var(--primary-color); color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; margin-left: 8px; display: none;">0</span>
-                </button>
-                <button class="btn" id="tabBtnMessages" style="background: #333; color: white; display: flex; align-items: center;" onclick="switchTab('messages')">
-                    Messages 
-                    <span id="msgBadge" style="background: var(--primary-color); color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; margin-left: 8px; display: none;">0</span>
-                </button>
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Dashboard Tab -->
+            <div id="tabDashboard" class="tab-pane active">
+                <div class="content-header">
+                    <h2>Dashboard Overview</h2>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(76, 175, 80, 0.1); color: #4CAF50;">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Revenue</span>
+                            <h3 id="statRevenue">0.00 TND</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(33, 150, 243, 0.1); color: #2196F3;">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Orders</span>
+                            <h3 id="statOrders">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(255, 152, 0, 0.1); color: #FF9800;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Active Products</span>
+                            <h3 id="statProducts">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <div class="activity-section">
+                        <h3>Recent Orders</h3>
+                        <div class="admin-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentOrdersBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div id="tabProducts">
-                <div class="admin-header">
+            <!-- Products Tab -->
+            <div id="tabProducts" class="tab-pane">
+                <div class="content-header">
                     <h2>Product Management</h2>
-                    <button class="btn btn-primary" onclick="openModal()">+ Add New Product</button>
+                    <button class="btn btn-primary" onclick="openModal()">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
                 </div>
 
                 <div class="admin-table-container">
@@ -54,16 +124,15 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="productTableBody">
-                            <!-- Products injected here -->
-                        </tbody>
+                        <tbody id="productTableBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="tabOrders" style="display: none;">
-                <div class="admin-header">
-                    <h2>Customer Orders</h2>
+            <!-- Orders Tab -->
+            <div id="tabOrders" class="tab-pane">
+                <div class="content-header">
+                    <h2>Orders</h2>
                 </div>
                 <div class="admin-table-container">
                     <table class="admin-table">
@@ -77,16 +146,15 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="ordersTableBody">
-                            <!-- Orders injected here -->
-                        </tbody>
+                        <tbody id="ordersTableBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="tabMessages" style="display: none;">
-                <div class="admin-header">
-                    <h2>Customer Messages</h2>
+            <!-- Messages Tab -->
+            <div id="tabMessages" class="tab-pane">
+                <div class="content-header">
+                    <h2>Messages</h2>
                 </div>
                 <div class="admin-table-container">
                     <table class="admin-table">
@@ -100,61 +168,131 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="messagesTableBody">
-                            <!-- Messages injected here -->
-                        </tbody>
+                        <tbody id="messagesTableBody"></tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </main>
+
+            <!-- Settings Tab -->
+            <div id="tabSettings" class="tab-pane">
+                <div class="content-header">
+                    <h2>Site Settings</h2>
+                </div>
+                <div class="settings-container">
+                    <form id="settingsForm" class="admin-form">
+                        <div class="form-section">
+                            <h3>Contact Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Store Phone Number</label>
+                                    <input type="text" id="setPhone" placeholder="+216 ...">
+                                </div>
+                                <div class="form-group">
+                                    <label>WhatsApp Number</label>
+                                    <input type="text" id="setWhatsapp" placeholder="12345678">
+                                </div>
+                                <div class="form-group">
+                                    <label>Contact Email</label>
+                                    <input type="email" id="setEmail" placeholder="contact@lordnutrition.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Store Address</label>
+                                    <input type="text" id="setAddress" placeholder="Tunis, Tunisia">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Social Media</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Facebook Page Link</label>
+                                    <input type="url" id="setFacebook" placeholder="https://facebook.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Instagram Profile Link</label>
+                                    <input type="url" id="setInstagram" placeholder="https://instagram.com/...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save All Settings</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <!-- Product Modal -->
     <div class="modal" id="productModal">
         <div class="modal-content admin-modal">
-            <h2 id="modalTitle">Add Product</h2>
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Product</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
             <form id="productForm">
                 <input type="hidden" id="productId">
                 
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" id="productName" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="productCategory" required>
-                        <option value="protein">Protein</option>
-                        <option value="mass">Mass Gainers</option>
-                        <option value="preworkout">Pre-Workout</option>
-                        <option value="vitamins">Vitamins</option>
-                        <option value="pack">Packs</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Price ($)</label>
-                    <input type="number" id="productPrice" step="0.01" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Image URL (e.g., assets/product.png)</label>
-                    <input type="text" id="productImage" value="assets/product.png" required>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="productCategory" required>
+                            <option value="protein">Protein</option>
+                            <option value="mass">Mass Gainers</option>
+                            <option value="preworkout">Pre-Workout</option>
+                            <option value="vitamins">Vitamins</option>
+                            <option value="pack">Packs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (TND)</label>
+                        <input type="number" id="productPrice" step="0.01" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Product Image</label>
+                        <div class="image-upload-zone" id="imageDropZone">
+                            <input type="file" id="productImageInput" accept="image/*" hidden>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload or drag & drop image</p>
+                                <small>Recommended: 800x800px (PNG/JPG)</small>
+                            </div>
+                            <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                                <img id="imagePreview" src="" alt="Preview">
+                                <button type="button" class="remove-preview" onclick="removeImagePreview()">&times;</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="productImageValue">
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label>Description</label>
-                    <textarea id="productDesc" rows="3" required></textarea>
+                    <textarea id="productDesc" rows="2" required></textarea>
                 </div>
                 
-                <div class="form-group">
-                    <label>Benefits (Comma separated)</label>
-                    <input type="text" id="productBenefits" placeholder="e.g., 25g Protein, Zero Sugar">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Benefits (Comma separated)</label>
+                        <input type="text" id="productBenefits" placeholder="e.g. 25g Protein, Zero Sugar">
+                    </div>
+                    <div class="form-group">
+                        <label>Flavors (Comma separated)</label>
+                        <input type="text" id="productFlavors" placeholder="e.g. Chocolate, Vanilla">
+                    </div>
+                    <div class="form-group">
+                        <label>Sizes (Comma separated)</label>
+                        <input type="text" id="productSizes" placeholder="e.g. 900g, 2kg">
+                    </div>
                 </div>
                 
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <div class="modal-footer">
                     <button type="button" class="btn" style="background:#333; color:white;" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary" style="flex-grow: 1;">Save Product</button>
+                    <button type="submit" class="btn btn-primary">Save Product</button>
                 </div>
             </form>
         </div>

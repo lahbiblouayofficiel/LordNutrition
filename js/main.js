@@ -185,8 +185,13 @@ const translations = {
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
-    await loadSettings();
-    await loadProductsFromDB();
+    try {
+        await loadSettings();
+        await loadProductsFromDB();
+    } catch (e) {
+        console.error("Initialization error:", e);
+    }
+    
     initRouter();
     renderProducts();
     renderBestSellers();

@@ -182,22 +182,30 @@ const translations = {
 };
 
 // --- Initialization ---
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Router FIRST so links work immediately
+    initRouter();
+    
+    // 2. Load data in the background
+    initData();
+});
 
-async function init() {
+async function initData() {
     try {
         await loadSettings();
         await loadProductsFromDB();
+        renderProducts();
+        renderBestSellers();
+        updateLanguage();
+        applySettings();
     } catch (e) {
-        console.error("Initialization error:", e);
+        console.error("Data loading error:", e);
+        // Fallback already handled inside functions
     }
-    
-    initRouter();
-    renderProducts();
-    renderBestSellers();
-    updateCartCount();
-    updateLanguage();
-    applySettings();
+}
+
+// Legacy init kept for compatibility if needed
+async function init() {}
     
     // Mobile Menu
     document.getElementById('mobileMenuBtn').addEventListener('click', () => {

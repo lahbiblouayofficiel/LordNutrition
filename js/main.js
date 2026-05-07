@@ -495,10 +495,9 @@ function renderBestSellers() {
     const bestSellersGrid = document.getElementById('bestSellersGrid');
     if(!bestSellersGrid) return;
     
-    let products = JSON.parse(localStorage.getItem('lordProducts')) || [];
     bestSellersGrid.innerHTML = '';
     
-    products.slice(0, 3).forEach(p => {
+    lordProducts.slice(0, 3).forEach(p => {
         const div = document.createElement('div');
         div.className = 'product-card';
         div.innerHTML = `

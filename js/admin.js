@@ -1,12 +1,13 @@
-let products = [];
-let messages = [];
-let orders = [];
-let siteSettings = {};
-
 // --- Supabase Configuration ---
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';
 const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let db = null;
+
+if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_KEY') {
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} else {
+    console.warn("Supabase not configured in Admin. Using localStorage fallback.");
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadAllData();
@@ -14,23 +15,44 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadAllData() {
+    if (!db) {
+        products = JSON.parse(localStorage.getItem('lordProducts')) || [];
+        messages = JSON.parse(localStorage.getItem('lordMessages')) || [];
+        orders = JSON.parse(localStorage.getItem('lordOrders')) || [];
+        siteSettings = JSON.parse(localStorage.getItem('lordSettings')) || {
+            phone: '+216 12 345 678',
+            whatsapp: '12345678',
+            email: 'contact@lordnutrition.com',
+            address: 'Tunis, Tunisia',
+            facebook: 'https://facebook.com',
+            instagram: 'https://instagram.com'
+        };
+        return;
+    }
     // Load Products
-    const { data: pData } = await supabase.from('products').select('*');
+    const { data: pData } = await db.from('products').select('*');
     products = pData || [];
     
     // Load Orders
-    const { data: oData } = await supabase.from('orders').select('*');
+    const { data: oData } = await db.from('orders').select('*');
     orders = oData || [];
     
     // Load Messages
-    const { data: mData } = await supabase.from('messages').select('*');
+    const { data: mData } = await db.from('messages').select('*');
     messages = mData || [];
     
     // Load Settings
-    const { data: sData } = await supabase.from('settings').select('*');
+    const { data: sData } = await db.from('settings').select('*');
     if (sData) {
         sData.forEach(s => siteSettings[s.key] = s.value);
     }
+}
+
+function saveToLocal() {
+    localStorage.setItem('lordProducts', JSON.stringify(products));
+    localStorage.setItem('lordMessages', JSON.stringify(messages));
+    localStorage.setItem('lordOrders', JSON.stringify(orders));
+    localStorage.setItem('lordSettings', JSON.stringify(siteSettings));
 }
 
 // Storage removal
@@ -196,12 +218,15 @@ async function handleProductSubmit(e) {
     };
 
     if (idx === '') {
-        await supabase.from('products').insert([productData]);
+        if (db) await db.from('products').insert([productData]);
+        else products.push({ ...productData, id: Date.now() });
     } else {
         const pId = products[parseInt(idx)].id;
-        await supabase.from('products').update(productData).eq('id', pId);
+        if (db) await db.from('products').update(productData).eq('id', pId);
+        else products[parseInt(idx)] = { ...products[parseInt(idx)], ...productData };
     }
 
+    if (!db) saveToLocal();
     await loadAllData();
     renderProductsTable();
     renderDashboard();
@@ -210,8 +235,13 @@ async function handleProductSubmit(e) {
 
 async function deleteProduct(idx) {
     if (confirm('Delete this product permanently?')) {
-        const pId = products[idx].id;
-        await supabase.from('products').delete().eq('id', pId);
+        if (db) {
+            const pId = products[idx].id;
+            await db.from('products').delete().eq('id', pId);
+        } else {
+            products.splice(idx, 1);
+            saveToLocal();
+        }
         await loadAllData();
         renderProductsTable();
         renderDashboard();
@@ -251,11 +281,16 @@ function renderOrdersTable() {
 }
 
 async function updateOrderStatus(idx, newStatus) {
-    const oId = orders[idx].id;
-    const update = { status: newStatus };
-    if (newStatus !== 'pending') update.is_read = true;
-    
-    await supabase.from('orders').update(update).eq('id', oId);
+    if (db) {
+        const oId = orders[idx].id;
+        const update = { status: newStatus };
+        if (newStatus !== 'pending') update.is_read = true;
+        await db.from('orders').update(update).eq('id', oId);
+    } else {
+        orders[idx].status = newStatus;
+        if (newStatus !== 'pending') orders[idx].isRead = true;
+        saveToLocal();
+    }
     
     await loadAllData();
     renderOrdersTable();
@@ -265,8 +300,13 @@ async function updateOrderStatus(idx, newStatus) {
 
 async function deleteOrder(idx) {
     if (confirm('Delete this order history?')) {
-        const oId = orders[idx].id;
-        await supabase.from('orders').delete().eq('id', oId);
+        if (db) {
+            const oId = orders[idx].id;
+            await db.from('orders').delete().eq('id', oId);
+        } else {
+            orders.splice(idx, 1);
+            saveToLocal();
+        }
         await loadAllData();
         renderOrdersTable();
         renderDashboard();
@@ -339,9 +379,11 @@ async function handleSettingsSubmit(e) {
     };
     
     for (const [key, value] of Object.entries(newSettings)) {
-        await supabase.from('settings').upsert({ key, value });
+        if (db) await db.from('settings').upsert({ key, value });
+        else siteSettings[key] = value;
     }
     
+    if (!db) saveToLocal();
     await loadAllData();
     alert('Settings saved successfully!');
 }

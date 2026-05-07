@@ -76,7 +76,13 @@ let currentLang = localStorage.getItem('lordLang') || 'FR';
 // --- Supabase Configuration ---
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';
 const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let db = null;
+
+if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_KEY') {
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} else {
+    console.warn("Supabase not configured. Using localStorage fallback.");
+}
 
 let siteSettings = {
     phone: '+216 12 345 678',
@@ -321,21 +327,30 @@ function handleRoute() {
 }
 
 async function loadProductsFromDB() {
+    if (!db) {
+        loadProducts();
+        return;
+    }
     try {
-        const { data, error } = await supabase.from('products').select('*');
+        const { data, error } = await db.from('products').select('*');
         if (!error && data && data.length > 0) {
             lordProducts = data;
         } else {
-            lordProducts = defaultProducts;
+            loadProducts();
         }
     } catch (e) {
-        lordProducts = defaultProducts;
+        loadProducts();
     }
 }
 
 async function loadSettings() {
+    if (!db) {
+        const local = JSON.parse(localStorage.getItem('lordSettings'));
+        if (local) siteSettings = local;
+        return;
+    }
     try {
-        const { data, error } = await supabase.from('settings').select('*');
+        const { data, error } = await db.from('settings').select('*');
         if (!error && data) {
             data.forEach(s => {
                 if (siteSettings.hasOwnProperty(s.key)) {
@@ -554,12 +569,18 @@ async function handleCheckout(e) {
         is_read: false
     };
 
-    const { error } = await supabase.from('orders').insert([orderData]);
-    
-    if (error) {
-        console.error('Order error:', error);
-        alert('Error placing order. Please try again.');
-        return;
+    if (db) {
+        const { error } = await db.from('orders').insert([orderData]);
+        if (error) {
+            console.error('Order error:', error);
+            alert('Error placing order. Please try again.');
+            return;
+        }
+    } else {
+        // Fallback to localStorage
+        let orders = JSON.parse(localStorage.getItem('lordOrders')) || [];
+        orders.push(orderData);
+        localStorage.setItem('lordOrders', JSON.stringify(orders));
     }
     
     // Simulate API call for order

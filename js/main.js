@@ -183,58 +183,53 @@ const translations = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize Router FIRST so links work immediately
+    // 1. Initialize UI Elements & Listeners
+    initUI();
+
+    // 2. Initialize Router
     initRouter();
     
-    // 2. Load data in the background
+    // 3. Load data in the background
     initData();
 });
 
-async function initData() {
-    try {
-        await loadSettings();
-        await loadProductsFromDB();
-        renderProducts();
-        renderBestSellers();
-        updateLanguage();
-        applySettings();
-    } catch (e) {
-        console.error("Data loading error:", e);
-        // Fallback already handled inside functions
-    }
-}
-
-// Legacy init kept for compatibility if needed
-async function init() {}
-    
+function initUI() {
     // Mobile Menu
-    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-        document.getElementById('mobileNav').classList.toggle('open');
-    });
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            document.getElementById('mobileNav').classList.toggle('open');
+        });
+    }
 
     document.documentElement.dir = currentLang === 'AR' ? 'rtl' : 'ltr';
     
     function updateLangBtn() {
+        const langToggle = document.getElementById('langToggle');
+        if (!langToggle) return;
         let displayLang = 'AR';
         if (currentLang === 'EN') displayLang = 'FR';
         if (currentLang === 'FR') displayLang = 'AR';
         if (currentLang === 'AR') displayLang = 'EN';
-        document.getElementById('langToggle').innerText = displayLang;
+        langToggle.innerText = displayLang;
     }
     
     updateLangBtn();
     
     // Language Toggle
-    document.getElementById('langToggle').addEventListener('click', () => {
-        if (currentLang === 'EN') currentLang = 'FR';
-        else if (currentLang === 'FR') currentLang = 'AR';
-        else currentLang = 'EN';
-        
-        localStorage.setItem('lordLang', currentLang);
-        updateLangBtn();
-        document.documentElement.dir = currentLang === 'AR' ? 'rtl' : 'ltr';
-        updateLanguage();
-    });
+    const langToggle = document.getElementById('langToggle');
+    if (langToggle) {
+        langToggle.addEventListener('click', () => {
+            if (currentLang === 'EN') currentLang = 'FR';
+            else if (currentLang === 'FR') currentLang = 'AR';
+            else currentLang = 'EN';
+            
+            localStorage.setItem('lordLang', currentLang);
+            updateLangBtn();
+            document.documentElement.dir = currentLang === 'AR' ? 'rtl' : 'ltr';
+            updateLanguage();
+        });
+    }
 
     // Category Filter
     document.querySelectorAll('#categoryList li').forEach(li => {
@@ -246,44 +241,61 @@ async function init() {}
     });
 
     // Forms
-    document.getElementById('checkoutForm').addEventListener('submit', handleCheckout);
-    document.getElementById('contactForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const name = document.getElementById('contactName').value;
-        const email = document.getElementById('contactEmail').value;
-        const phone = document.getElementById('contactPhone').value;
-        const message = document.getElementById('contactMessage').value;
-        
-        let messages = JSON.parse(localStorage.getItem('lordMessages')) || [];
-        messages.push({
-            id: Date.now(),
-            date: new Date().toLocaleString(),
-            name,
-            email,
-            phone,
-            message,
-            isRead: false
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) checkoutForm.addEventListener('submit', handleCheckout);
+
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            const message = document.getElementById('contactMessage').value;
+            
+            let messages = JSON.parse(localStorage.getItem('lordMessages')) || [];
+            messages.push({
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                name, email, phone, message,
+                isRead: false
+            });
+            localStorage.setItem('lordMessages', JSON.stringify(messages));
+            alert('Message sent successfully!');
+            e.target.reset();
         });
-        localStorage.setItem('lordMessages', JSON.stringify(messages));
-        
-        alert('Message sent successfully!');
-        e.target.reset();
-    });
+    }
 
     // Quantity Stepper
-    document.getElementById('qtyPlus').addEventListener('click', () => {
-        const input = document.getElementById('detailQty');
-        input.value = parseInt(input.value) + 1;
-    });
+    const qtyPlus = document.getElementById('qtyPlus');
+    const qtyMinus = document.getElementById('qtyMinus');
+    const detailQty = document.getElementById('detailQty');
+    if (qtyPlus && detailQty) {
+        qtyPlus.addEventListener('click', () => {
+            detailQty.value = parseInt(detailQty.value) + 1;
+        });
+    }
+    if (qtyMinus && detailQty) {
+        qtyMinus.addEventListener('click', () => {
+            if (parseInt(detailQty.value) > 1) {
+                detailQty.value = parseInt(detailQty.value) - 1;
+            }
+        });
+    }
+}
 
-    document.getElementById('qtyMinus').addEventListener('click', () => {
-        const input = document.getElementById('detailQty');
-        if (parseInt(input.value) > 1) {
-            input.value = parseInt(input.value) - 1;
-        }
-    });
-});
+async function initData() {
+    try {
+        await loadSettings();
+        await loadProductsFromDB();
+        renderProducts();
+        renderBestSellers();
+        updateLanguage();
+        applySettings();
+    } catch (e) {
+        console.error("Data loading error:", e);
+    }
+}
 
 // --- Routing (SPA) ---
 function initRouter() {

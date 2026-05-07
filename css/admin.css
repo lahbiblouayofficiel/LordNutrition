@@ -1,4 +1,5 @@
 /* Admin Layout Overhaul */
+.admin-mobile-header { display: none; }
 .admin-wrapper {
     display: flex;
     min-height: 100vh;
@@ -88,19 +89,91 @@
 }
 
 @media (max-width: 992px) {
-    .admin-sidebar {
-        width: 70px;
+    .admin-mobile-header {
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        height: 60px;
+        background: #12151f;
+        border-bottom: 1px solid var(--border-color);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 101;
+        gap: 15px;
     }
-    .sidebar-header .logo, .nav-item span:not(.badge), .sidebar-footer .btn span {
+    
+    .admin-mobile-header .logo {
+        font-size: 1.2rem;
+    }
+
+    .mobile-toggle {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .admin-sidebar {
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        top: 60px;
+        height: calc(100vh - 60px);
+    }
+
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .admin-content {
+        margin-left: 0;
+        max-width: 100vw;
+        padding: 80px 15px 30px 15px; /* Added top padding for fixed header */
+    }
+
+    .sidebar-header {
         display: none;
     }
-    .admin-content {
-        margin-left: 70px;
-        max-width: calc(100vw - 70px);
+
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
     }
-    .nav-item {
-        justify-content: center;
-        padding: 20px;
+
+    .content-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .admin-table-container {
+        overflow-x: auto;
+    }
+
+    .admin-table th, .admin-table td {
+        padding: 10px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .modal-content {
+        width: 95% !important;
+        padding: 20px !important;
+        margin: 10px auto;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
     }
 }
 

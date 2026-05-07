@@ -62,12 +62,23 @@ function saveToLocal() {
 // Storage removal
 
 function initAdmin() {
+    // Mobile Toggle
+    const adminMobileBtn = document.getElementById('adminMobileBtn');
+    if (adminMobileBtn) {
+        adminMobileBtn.addEventListener('click', () => {
+            document.querySelector('.admin-sidebar').classList.toggle('open');
+        });
+    }
+
     // Nav Click Handlers
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const tab = item.dataset.tab;
             switchTab(tab);
+            
+            // Close sidebar on mobile
+            document.querySelector('.admin-sidebar').classList.remove('open');
         });
     });
 

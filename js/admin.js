@@ -10,7 +10,11 @@ if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_KEY'
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadAllData();
+    try {
+        await loadAllData();
+    } catch (e) {
+        console.error("Admin data load error:", e);
+    }
     initAdmin();
 });
 

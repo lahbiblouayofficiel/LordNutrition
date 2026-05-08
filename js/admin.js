@@ -20,7 +20,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAllData() {
     if (!db) {
-        products = JSON.parse(localStorage.getItem('lordProducts')) || [];
+        // Load from localStorage, fallback to defaultProducts (from products-data.js)
+        const stored = JSON.parse(localStorage.getItem('lordProducts'));
+        if (stored && stored.length >= defaultProducts.length) {
+            products = stored;
+        } else {
+            products = defaultProducts;
+            localStorage.setItem('lordProducts', JSON.stringify(defaultProducts));
+        }
         messages = JSON.parse(localStorage.getItem('lordMessages')) || [];
         orders = JSON.parse(localStorage.getItem('lordOrders')) || [];
         siteSettings = JSON.parse(localStorage.getItem('lordSettings')) || {

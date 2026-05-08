@@ -11,8 +11,153 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* ===== LOGIN OVERLAY ===== */
+        #loginOverlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #0a0a0a;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+        #loginOverlay .login-bg {
+            position: absolute; inset: 0; overflow: hidden;
+        }
+        #loginOverlay .login-bg::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(200,0,0,0.18) 0%, transparent 70%);
+            top: -100px; left: -100px; border-radius: 50%;
+        }
+        #loginOverlay .login-bg::after {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(200,0,0,0.10) 0%, transparent 70%);
+            bottom: -80px; right: -80px; border-radius: 50%;
+        }
+        #loginOverlay .login-card {
+            position: relative; z-index: 1;
+            background: rgba(20,20,20,0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(200,0,0,0.25);
+            border-radius: 20px;
+            padding: 48px 44px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+            animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        #loginOverlay .login-logo {
+            text-align: center; margin-bottom: 8px;
+        }
+        #loginOverlay .login-logo span:first-child {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900; font-size: 2rem;
+            color: #c8102e; letter-spacing: 2px;
+        }
+        #loginOverlay .login-logo span:last-child {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900; font-size: 2rem;
+            color: #fff; letter-spacing: 2px;
+        }
+        #loginOverlay .login-subtitle {
+            text-align: center; color: rgba(255,255,255,0.4);
+            font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase;
+            margin-bottom: 36px;
+        }
+        #loginOverlay .login-field {
+            margin-bottom: 18px;
+        }
+        #loginOverlay .login-field label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            color: rgba(255,255,255,0.5); text-transform: uppercase;
+            letter-spacing: 1.5px; margin-bottom: 8px;
+        }
+        #loginOverlay .login-field .input-wrap {
+            position: relative;
+        }
+        #loginOverlay .login-field .input-wrap i {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: rgba(255,255,255,0.3); font-size: 0.85rem;
+        }
+        #loginOverlay .login-field input {
+            width: 100%; padding: 13px 14px 13px 40px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; color: #fff; font-size: 0.95rem;
+            outline: none; transition: border-color 0.2s, background 0.2s;
+            box-sizing: border-box;
+        }
+        #loginOverlay .login-field input:focus {
+            border-color: #c8102e;
+            background: rgba(200,16,46,0.07);
+        }
+        #loginOverlay .login-error {
+            color: #ff4d4d; font-size: 0.8rem; text-align: center;
+            margin-bottom: 14px; min-height: 20px;
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+        }
+        #loginOverlay .login-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #c8102e, #a00020);
+            color: #fff; font-size: 1rem; font-weight: 700;
+            border: none; border-radius: 10px; cursor: pointer;
+            letter-spacing: 1px; text-transform: uppercase;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 24px rgba(200,16,46,0.4);
+        }
+        #loginOverlay .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(200,16,46,0.55);
+        }
+        #loginOverlay .login-btn:active { transform: translateY(0); }
+        #loginOverlay .login-footer {
+            text-align: center; margin-top: 24px;
+            color: rgba(255,255,255,0.2); font-size: 0.75rem;
+        }
+        .admin-wrapper, .admin-mobile-header { transition: opacity 0.4s; }
+    </style>
 </head>
 <body>
+    <!-- ===== LOGIN OVERLAY ===== -->
+    <div id="loginOverlay">
+        <div class="login-bg"></div>
+        <div class="login-card">
+            <div class="login-logo">
+                <span>LORD</span><span>ADMIN</span>
+            </div>
+            <p class="login-subtitle">Secure Access Portal</p>
+            <form id="loginForm" onsubmit="handleAdminLogin(event)">
+                <div class="login-field">
+                    <label>Username</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username" required>
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password" required>
+                    </div>
+                </div>
+                <div class="login-error" id="loginError"></div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> &nbsp;Access Dashboard
+                </button>
+            </form>
+            <p class="login-footer">LORD NUTRITION &copy; 2025 &mdash; Admin Panel</p>
+        </div>
+    </div>
+
     <!-- Mobile Header -->
     <header class="admin-mobile-header">
         <button id="adminMobileBtn" class="mobile-toggle">
@@ -309,6 +454,41 @@
         </div>
     </div>
 
+    <script>
+        // ===== ADMIN LOGIN GATE =====
+        const ADMIN_USER = 'lordadmin';
+        const ADMIN_PASS = 'Lord@2025!';
+        const SESSION_KEY = 'lordAdminAuth';
+
+        function checkAdminSession() {
+            const auth = sessionStorage.getItem(SESSION_KEY);
+            if (auth === 'true') {
+                document.getElementById('loginOverlay').style.display = 'none';
+            }
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            const err  = document.getElementById('loginError');
+
+            if (user === ADMIN_USER && pass === ADMIN_PASS) {
+                sessionStorage.setItem(SESSION_KEY, 'true');
+                const overlay = document.getElementById('loginOverlay');
+                overlay.style.opacity = '0';
+                overlay.style.transition = 'opacity 0.4s';
+                setTimeout(() => overlay.style.display = 'none', 400);
+            } else {
+                err.textContent = 'Invalid username or password.';
+                err.style.animation = 'none';
+                requestAnimationFrame(() => err.style.animation = '');
+                document.getElementById('loginPass').value = '';
+            }
+        }
+
+        checkAdminSession();
+    </script>
     <script src="js/admin.js"></script>
 </body>
 </html>

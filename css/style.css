@@ -522,10 +522,126 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
-.category-card:hover h3 {
-    color: #fff;
-    transform: scale(1.05);
+/* ===== PREMIUM CATEGORY LIST ===== */
+.cat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 700px;
+    margin: 0 auto;
 }
+
+.cat-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 24px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255,255,255,0.07);
+    background: var(--bg-card);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer line on left */
+.cat-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+    transition: width 0.3s ease;
+}
+
+.cat-item:hover {
+    transform: translateX(6px);
+    border-color: rgba(255,255,255,0.12);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.cat-item:hover::before {
+    width: 4px;
+}
+
+/* Icon wrap */
+.cat-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.cat-item:hover .cat-icon-wrap {
+    transform: scale(1.12) rotate(-4deg);
+}
+
+/* Text */
+.cat-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cat-label {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-main);
+    letter-spacing: 0.3px;
+}
+
+.cat-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+/* Arrow */
+.cat-arrow {
+    font-size: 0.8rem;
+    color: var(--text-subtle);
+    transition: transform 0.3s ease, color 0.3s ease;
+    flex-shrink: 0;
+}
+
+.cat-item:hover .cat-arrow {
+    transform: translateX(4px);
+}
+
+/* Per-category colors */
+.cat-protein::before   { background: #e53935; }
+.cat-mass::before      { background: #ff6f00; }
+.cat-preworkout::before{ background: #d500f9; }
+.cat-vitamins::before  { background: #00bfa5; }
+.cat-pack::before      { background: #2979ff; }
+
+.cat-protein   .cat-icon-wrap { background: rgba(229,57,53,0.12);  color: #e53935; }
+.cat-mass      .cat-icon-wrap { background: rgba(255,111,0,0.12);  color: #ff8f00; }
+.cat-preworkout.cat-icon-wrap { background: rgba(213,0,249,0.12);  color: #e040fb; }
+.cat-vitamins  .cat-icon-wrap { background: rgba(0,191,165,0.12);  color: #1de9b6; }
+.cat-pack      .cat-icon-wrap { background: rgba(41,121,255,0.12); color: #448aff; }
+
+.cat-protein:hover   .cat-arrow { color: #e53935; }
+.cat-mass:hover      .cat-arrow { color: #ff8f00; }
+.cat-preworkout:hover .cat-arrow{ color: #e040fb; }
+.cat-vitamins:hover  .cat-arrow { color: #1de9b6; }
+.cat-pack:hover      .cat-arrow { color: #448aff; }
+
+@media (max-width: 600px) {
+    .cat-item { padding: 14px 18px; gap: 14px; }
+    .cat-icon-wrap { width: 44px; height: 44px; font-size: 1.1rem; }
+    .cat-label { font-size: 0.95rem; }
+}
+
+
 
 /* Shop Layout */
 .shop-container {
